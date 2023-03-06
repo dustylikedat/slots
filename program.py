@@ -34,50 +34,7 @@ def waiting_animation(): #- animation
         line = ""
     pass
 
-# menu and leaderboard screen
-
-
-def menu():
-  print("Welcome to the slot machine!")
-  menu = input("Type 'leaderboard' to view the leaderboard, just press enter to enter continue to the game. ")
-  clear()
-  if menu == 'leaderboard':
-    for x in open('leaderboard.txt', 'r'):
-      print(x)
-      sleep(0.5)
-
-    input("Press enter to continue")
-    clear()
-  
-  
-# main game
-
-menu()
-
-
-while balance > 0:
-
-    #- Printing of slot machine
-
-    print("||"+slot_1+"||", "||"+slot_2+"||", "||"+slot_3+"||", '--- balance:', balance, '--- rolls:', rolls, msg)
-    
-    
-    if input("Press 'enter' to roll the machine: ") == "speed_up":
-        speed = 0.05
-    waiting_animation()
-    
-    #- Number gen
-    
-    i = random.randint(0, 8)
-    slot_1 = fruit[i]
-    i = random.randint(0, 8)
-    slot_2 = fruit[i]
-    i = random.randint(0, 8)
-    slot_3 = fruit[i]
-
-    msg = ""
-    
-    #- Points calculator
+def points_calculator(slot_1, slot_2, slot_3, balance, msg): #- calculates points
     if slot_1 == slot_2 or slot_2 == slot_3: #- 2 in a row
         balance += 2
         msg += colored(" | You got 2 in a row! +2 balance", "blue")
@@ -98,15 +55,78 @@ while balance > 0:
         msg += colored(" | Wish upon a star! +1 balance", "green")
     if slot_1 == "💩" or slot_2 == "💩" or slot_3 == "💩": #- poo
         balance -= 1
-        msg += colored(" | Ew! -1 balance", "red")      
+        msg += colored(" | Ew! -1 balance", "red")
+    balance -= 1
+    return balance, msg
+
+def gen(fruit): #- random number generator
+    i = random.randint(0, 8)
+    slot_1 = fruit[i]
+    i = random.randint(0, 8)
+    slot_2 = fruit[i]
+    i = random.randint(0, 8)
+    slot_3 = fruit[i]
+    return slot_1, slot_2, slot_3
+
+
+# menu and leaderboard screen
+
+
+def menu():
+  print("Welcome to the slot machine!")
+  menu = input("Type 'leaderboard' to view the leaderboard, just press enter to enter continue to the game. ")
+  clear()
+  if menu == 'leaderboard':
+    for x in open('leaderboard.txt', 'r'):
+      print(x)
+      sleep(0.5)
+
+    input("Press enter to continue")
+    clear()
+  
+  
+# main game
+
+menu()
+
+while True:
+
+    while balance > 0:
+
+        #- Printing of slot machine
+
+        print("||"+slot_1+"||", "||"+slot_2+"||", "||"+slot_3+"||", '--- balance:', balance, '--- rolls:', rolls, msg)
     
-    rolls += 1
+    
+        if input("Press 'enter' to roll the machine: ") == "speed_up":
+            speed = 0.05
+        waiting_animation()
+    
+        #- Number gen
+    
+        slot_1, slot_2, slot_3 = gen(fruit)
 
-clear()
-print(f"You finished with a score of {rolls}")
+        msg = ""
+    
+        #- Points calculator
+        balance, msg = points_calculator(slot_1, slot_2, slot_3, balance, msg)   
+    
+        rolls += 1
 
-if input("Would you like to save your score? (y/n): ") == "y":
-    name = input("Enter your name: ")
-    with open("leaderboard.txt", "a") as f:
-        f.write(f"{name}: {rolls} rolls\n")
-input("Open and close the program to play again.")
+    clear()
+    print(f"You finished with a score of {rolls}")
+
+
+    # save score system
+    if input("Would you like to save your score? (y/n): ") == "y":
+        name = input("Enter your name: ")
+        with open("leaderboard.txt", "a") as f:
+            f.write(f"{name}: {rolls} rolls\n")
+    input("Press enter to play again")
+
+    # resetting of values
+
+    balance = 5 
+    slot_2 = "X"
+    rolls = 0
+    msg = " | Messages will be printed here!"
